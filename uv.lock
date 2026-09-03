@@ -5,13 +5,17 @@ requires-python = ">=3.14"
 [[package]]
 name = "ai-eval"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
+    { name = "pydantic" },
     { name = "pydantic-evals" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "pydantic-evals", specifier = ">=2.37.0" }]
+requires-dist = [
+    { name = "pydantic", specifier = ">=2.12.0" },
+    { name = "pydantic-evals", specifier = ">=2.37.0" },
+]
 
 [[package]]
 name = "annotated-types"

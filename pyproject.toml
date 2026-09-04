@@ -1,0 +1,12 @@
+[project]
+name = "ai-grading-eval-download"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "mistralai>=2.9.4",
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+]

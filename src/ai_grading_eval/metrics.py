@@ -5,6 +5,7 @@ from pydantic import BaseModel
 
 class EvaluationMetrics(BaseModel):
     case_count: int
+    accuracy: float
     mae: float
     qwk: float
 
@@ -60,6 +61,7 @@ def quadratic_weighted_kappa(
 def calculate_metrics(human_scores: list[int], ai_scores: list[int], *, maximum: int) -> EvaluationMetrics:
     return EvaluationMetrics(
         case_count=len(human_scores),
+        accuracy=sum(human == ai for human, ai in zip(human_scores, ai_scores, strict=True)) / len(human_scores),
         mae=mean_absolute_error(human_scores, ai_scores),
         qwk=quadratic_weighted_kappa(human_scores, ai_scores, maximum=maximum),
     )

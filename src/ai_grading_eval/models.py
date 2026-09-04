@@ -72,6 +72,7 @@ class GraderOutput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     score: int = Field(ge=0)
+    point_scores: dict[str, int] = Field(default_factory=dict)
     feedback: str = Field(min_length=1)
 
 

@@ -1,0 +1,17 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local secrets and generated documents
+.env
+input_pdfs/*.pdf
+output_markdown/*
+!input_pdfs/.gitkeep
+!output_markdown/.gitkeep

@@ -57,7 +57,7 @@ function App() {
       />
       <div className="mx-auto mt-5 grid w-full max-w-7xl gap-5 md:grid-cols-[minmax(0,1fr)_minmax(15rem,20rem)]">
         {selectedExam ? (
-          <EvidencePanel key={selectedExam.review_item_id} exam={selectedExam} />
+          <EvidencePanel key={`evidence-${selectedExam.review_item_id}`} exam={selectedExam} />
         ) : (
           <section aria-live="polite" className="rounded-xl border bg-card p-6 shadow-sm">
             <h2 className="text-lg font-semibold">{loading ? 'Loading assignment…' : 'No assignment available'}</h2>
@@ -68,7 +68,7 @@ function App() {
         )}
         {selectedExam ? (
           <ScoringPanel
-            key={selectedExam.review_item_id}
+            key={`scoring-${selectedExam.review_item_id}`}
             exam={selectedExam}
             review={reviews[selectedExam.review_item_id]}
             onScoreChange={(criterionId, score) => updateScore(selectedExam.review_item_id, criterionId, score)}

@@ -7,9 +7,12 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox'
 import type { Exam } from '@/features/review/lib/exam-loader'
+import { isReviewComplete } from '@/features/review/lib/scoring'
+import type { ReviewEntry } from '@/features/review/types'
 
 type ReviewTopBarProps = {
   exams: Exam[]
+  reviews: Record<string, ReviewEntry>
   selectedIndex: number
   onSelectExam: (index: number) => void
   loading: boolean
@@ -18,6 +21,7 @@ type ReviewTopBarProps = {
 
 export function ReviewTopBar({
   exams,
+  reviews,
   selectedIndex,
   onSelectExam,
   loading,
@@ -25,6 +29,12 @@ export function ReviewTopBar({
 }: ReviewTopBarProps) {
   const selectedExam = exams[selectedIndex]
   const examOptions = exams.map((exam, index) => `${index + 1}. ${exam.question_id}`)
+  const completedOptions = new Set(
+    exams.flatMap((exam, index) => (
+      isReviewComplete(exam.criteria, reviews[exam.review_item_id]) ? [examOptions[index]] : []
+    )),
+  )
+  const selectedCompleted = selectedExam && completedOptions.has(examOptions[selectedIndex])
 
   return (
     <header className="mx-auto flex w-full max-w-7xl flex-col gap-4 rounded-xl border bg-card px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6">
@@ -61,7 +71,12 @@ export function ReviewTopBar({
             <ComboboxList>
               {(item: string) => (
                 <ComboboxItem key={item} value={item}>
-                  {item}
+                  <span className="min-w-0 flex-1 truncate">{item}</span>
+                  <span className={completedOptions.has(item)
+                    ? 'mr-4 shrink-0 text-xs font-medium text-emerald-700 dark:text-emerald-400'
+                    : 'mr-4 shrink-0 text-xs text-muted-foreground'}>
+                    {completedOptions.has(item) ? 'Completed' : 'Not completed'}
+                  </span>
                 </ComboboxItem>
               )}
             </ComboboxList>
@@ -73,10 +88,17 @@ export function ReviewTopBar({
         {error ? (
           <p role="status" className="text-destructive">{error}</p>
         ) : selectedExam ? (
-          <p>
-            <span className="font-medium text-foreground">{selectedIndex + 1}</span>
-            {' '}of {exams.length}
-          </p>
+          <div>
+            <p>
+              <span className="font-medium text-foreground">{selectedIndex + 1}</span>
+              {' '}of {exams.length}
+            </p>
+            <p className={selectedCompleted
+              ? 'text-xs font-medium text-emerald-700 dark:text-emerald-400'
+              : 'text-xs text-muted-foreground'}>
+              {selectedCompleted ? 'Completed' : 'Not completed'}
+            </p>
+          </div>
         ) : (
           <p>{loading ? 'Preparing review…' : 'Ready when exams are loaded'}</p>
         )}

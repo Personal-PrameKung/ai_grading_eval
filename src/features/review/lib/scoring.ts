@@ -29,3 +29,15 @@ export function canCompleteReview(criteria: Criterion[], review: ReviewEntry | u
 
   return criteriaScored && confidenceSelected
 }
+
+export function isReviewComplete(criteria: Criterion[], review: ReviewEntry | undefined): boolean {
+  if (review?.review_status !== 'completed' || !canCompleteReview(criteria, review)) return false
+
+  return criteria.every((criterion) => {
+    const saved = review[`criterion_score_${criterion.id}`]
+    if (saved === undefined || saved === '') return false
+
+    const score = Number(saved)
+    return Number.isInteger(score) && score >= 0 && score <= criterion.max
+  })
+}

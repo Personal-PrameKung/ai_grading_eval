@@ -50,6 +50,7 @@ function App() {
     <main className="min-h-screen bg-muted/40 px-4 py-5 sm:px-6 sm:py-8">
       <ReviewTopBar
         exams={exams}
+        reviews={reviews}
         selectedIndex={selectedIndex}
         onSelectExam={selectIndex}
         loading={loading}

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import type { Exam } from '@/features/review/lib/exam-loader'
-import { canCompleteReview, criterionScore, maximumScore, scoreTotal } from '@/features/review/lib/scoring'
+import { canCompleteReview, criterionScore, isReviewComplete, maximumScore, scoreTotal } from '@/features/review/lib/scoring'
 import type { ReviewConfidence, ReviewEntry } from '@/features/review/types'
 
 const confidenceOptions = [
@@ -39,7 +39,7 @@ export function ScoringPanel({
   const [completionAttempted, setCompletionAttempted] = useState(false)
   const total = scoreTotal(exam.criteria, review)
   const maximum = maximumScore(exam.criteria)
-  const completed = review?.review_status === 'completed'
+  const completed = isReviewComplete(exam.criteria, review)
   const canComplete = canCompleteReview(exam.criteria, review)
 
   const handleComplete = () => {

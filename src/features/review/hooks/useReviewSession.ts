@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import type { Exam } from '@/features/review/lib/exam-loader'
-import { canCompleteReview, criterionScore } from '@/features/review/lib/scoring'
+import { canCompleteReview, criterionScore, isReviewComplete } from '@/features/review/lib/scoring'
 import type {
   PersistedReviewSession,
   ReviewConfidence,
@@ -100,7 +100,7 @@ export function useReviewSession() {
   const completeReview = useCallback((exam: Exam) => {
     setSession((current) => {
       const review = current.reviews[exam.review_item_id] || {}
-      if (review.review_status === 'completed' || !canCompleteReview(exam.criteria, review)) {
+      if (isReviewComplete(exam.criteria, review) || !canCompleteReview(exam.criteria, review)) {
         return current
       }
 

@@ -26,8 +26,9 @@ export function ClearDraftDialog({ disabled, onConfirm }: ClearDraftDialogProps)
               render={
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="destructive"
                   size="icon-sm"
+                  className="bg-destructive/20 hover:bg-destructive/30 dark:bg-destructive/25 dark:hover:bg-destructive/35"
                   disabled={disabled}
                   aria-label="Clear progress"
                 />

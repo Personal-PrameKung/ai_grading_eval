@@ -8,6 +8,12 @@ export type ContextImage = {
   label: string
 }
 
+export type Criterion = {
+  id: string
+  text: string
+  max: number
+}
+
 export type Exam = Record<string, unknown> & {
   review_item_id: string
   question_id: string
@@ -17,6 +23,7 @@ export type Exam = Record<string, unknown> & {
   rubric_scoring_guide: string
   question_asset: QuestionAsset
   context_images: ContextImage[]
+  criteria: Criterion[]
 }
 
 const defaultExamDataUrl = '/data/assignments.json'
@@ -61,6 +68,26 @@ function parseContextImages(value: unknown, rowIndex: number): ContextImage[] {
   })
 }
 
+function parseCriteria(value: Record<string, unknown>, rowIndex: number): Criterion[] {
+  const criteria: Criterion[] = []
+
+  for (let number = 1; number <= 5; number += 1) {
+    const id = requiredText(value, `criterion_id_${number}`, rowIndex)
+    const text = requiredText(value, `criterion_text_${number}`, rowIndex)
+    const rawMax = requiredText(value, `criterion_max_${number}`, rowIndex)
+    if (!id.trim()) continue
+
+    const max = Number(rawMax)
+    if (!Number.isInteger(max) || max < 0) {
+      throw new Error(`Exam row ${rowIndex + 1} has an invalid criterion_max_${number}`)
+    }
+
+    criteria.push({ id, text, max })
+  }
+
+  return criteria
+}
+
 function parseExam(value: unknown, rowIndex: number): Exam {
   if (
     !isRecord(value)
@@ -80,6 +107,7 @@ function parseExam(value: unknown, rowIndex: number): Exam {
     rubric_scoring_guide: requiredText(value, 'rubric_scoring_guide', rowIndex),
     question_asset: parseQuestionAsset(value.question_asset, rowIndex),
     context_images: parseContextImages(value.context_images, rowIndex),
+    criteria: parseCriteria(value, rowIndex),
   }
 }
 

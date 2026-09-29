@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react'
 import { EvidencePanel } from '@/features/review/components/EvidencePanel'
 import { ReviewTopBar } from '@/features/review/components/ReviewTopBar'
+import { ScoringPanel } from '@/features/review/components/ScoringPanel'
+import { useReviewSession } from '@/features/review/hooks/useReviewSession'
 import { loadExams, type Exam } from '@/features/review/lib/exam-loader'
 
 function App() {
   const [exams, setExams] = useState<Exam[]>([])
-  const [selectedIndex, setSelectedIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { reviews, selectedIndex, selectIndex, clampIndex, updateScore } = useReviewSession()
 
   useEffect(() => {
     let active = true
 
     loadExams()
       .then((loadedExams) => {
-        if (active) setExams(loadedExams)
+        if (!active) return
+        setExams(loadedExams)
+        clampIndex(loadedExams.length)
       })
       .catch((loadError: unknown) => {
         if (!active) return
@@ -27,7 +31,7 @@ function App() {
     return () => {
       active = false
     }
-  }, [])
+  }, [clampIndex])
 
   const selectedExam = exams[selectedIndex]
 
@@ -36,7 +40,7 @@ function App() {
       <ReviewTopBar
         exams={exams}
         selectedIndex={selectedIndex}
-        onSelectExam={setSelectedIndex}
+        onSelectExam={selectIndex}
         loading={loading}
         error={error}
       />
@@ -51,7 +55,15 @@ function App() {
             </p>
           </section>
         )}
-        <aside aria-hidden="true" className="hidden min-h-[35rem] rounded-xl border bg-card shadow-sm md:block" />
+        {selectedExam ? (
+          <ScoringPanel
+            exam={selectedExam}
+            review={reviews[selectedExam.review_item_id]}
+            onScoreChange={(criterionId, score) => updateScore(selectedExam.review_item_id, criterionId, score)}
+          />
+        ) : (
+          <aside aria-hidden="true" className="hidden min-h-[35rem] rounded-xl border bg-card shadow-sm md:block" />
+        )}
       </div>
     </main>
   )

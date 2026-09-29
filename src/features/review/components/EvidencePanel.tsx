@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, Image as ImageIcon } from 'lucide-react'
+import { FileText, Image as ImageIcon, Sigma } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -7,6 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { MathPreview } from '@/features/review/components/MathPreview'
 import type { Exam } from '@/features/review/lib/exam-loader'
 
 type EvidencePanelProps = {
@@ -41,13 +42,42 @@ function ImageViewer({ src, alt }: ImageViewerProps) {
   )
 }
 
-function TextBlock({ title, text }: { title: string; text: string }) {
+function TextBlock({
+  title,
+  text,
+  latexToggle = false,
+}: {
+  title: string
+  text: string
+  latexToggle?: boolean
+}) {
+  const [showLatex, setShowLatex] = useState(latexToggle)
+
   return (
     <section className="min-w-0 rounded-lg border bg-muted/20 p-4 sm:p-5">
-      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        {latexToggle && (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-pressed={showLatex}
+            onClick={() => setShowLatex((current) => !current)}
+          >
+            <Sigma aria-hidden="true" />
+            {showLatex ? 'View text' : 'View LaTeX'}
+          </Button>
+        )}
+      </div>
       <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-7 text-foreground/85">
         {text || 'No text provided.'}
       </p>
+      {latexToggle && showLatex && (
+        <div className="mt-4">
+          <MathPreview text={text} />
+        </div>
+      )}
     </section>
   )
 }
@@ -58,7 +88,7 @@ function QuestionDisplay({ exam }: { exam: Exam }) {
 
   return (
     <section aria-labelledby="question-image-title">
-      <h3 id="question-image-title" className="mb-3 text-sm font-semibold">Original question</h3>
+      <h3 id="question-image-title" className="mb-3 text-sm font-semibold">Question</h3>
       <div className="relative">
         {showText ? (
           <div className="min-h-48 rounded-lg border bg-muted/20 px-4 pb-4 pt-16 sm:px-5">
@@ -120,8 +150,13 @@ export function EvidencePanel({ exam }: EvidencePanelProps) {
         )}
 
         <QuestionDisplay exam={exam} />
-        <TextBlock title="Reference solution" text={exam.canonical_solution} />
-        <TextBlock title="Student response" text={exam.answer_text} />
+        <section aria-labelledby="grading-title">
+          <h3 id="grading-title" className="mb-3 text-sm font-semibold">Grading</h3>
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+            <TextBlock title="Reference solution" text={exam.canonical_solution} latexToggle />
+            <TextBlock title="Student response" text={exam.answer_text} latexToggle />
+          </div>
+        </section>
         <TextBlock title="Scoring guide" text={exam.rubric_scoring_guide} />
       </div>
     </section>

@@ -88,10 +88,23 @@ function QuestionDisplay({ exam }: { exam: Exam }) {
 
   return (
     <section aria-labelledby="question-image-title">
-      <h3 id="question-image-title" className="mb-3 text-sm font-semibold">Question</h3>
-      <div className="relative">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h3 id="question-image-title" className="text-sm font-semibold">Question</h3>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          aria-pressed={showText}
+          onClick={() => setShowText((current) => !current)}
+          className="border border-border bg-card shadow-sm"
+        >
+          {showText ? <ImageIcon aria-hidden="true" /> : <FileText aria-hidden="true" />}
+          {showText ? 'View image' : 'View as text'}
+        </Button>
+      </div>
+      <div>
         {showText ? (
-          <div className="min-h-48 rounded-lg border bg-muted/20 px-4 pb-4 pt-16 sm:px-5">
+          <div className="min-h-48 rounded-lg border bg-muted/20 p-4 sm:p-5">
             <p className="whitespace-pre-wrap break-words text-sm leading-7 text-foreground/85">
               {exam.question_text || 'No question text provided.'}
             </p>
@@ -99,17 +112,6 @@ function QuestionDisplay({ exam }: { exam: Exam }) {
         ) : (
           <ImageViewer src={questionImage} alt={`${exam.question_id} question image`} />
         )}
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          aria-pressed={showText}
-          onClick={() => setShowText((current) => !current)}
-          className="absolute right-3 top-3 z-10 border border-border bg-card shadow-sm"
-        >
-          {showText ? <ImageIcon aria-hidden="true" /> : <FileText aria-hidden="true" />}
-          {showText ? 'View image' : 'View as text'}
-        </Button>
       </div>
       {exam.question_asset.asset_kind === 'fallback_range' && !showText && (
         <p className="mt-2 text-xs text-muted-foreground">

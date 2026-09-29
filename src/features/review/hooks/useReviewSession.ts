@@ -45,12 +45,16 @@ export function useReviewSession() {
   const [session, setSession] = useState<ReviewSession>(readSavedSession)
 
   useEffect(() => {
-    const saved: PersistedReviewSession = {
-      ...session.reviews,
-      __index: session.currentIndex,
-    }
-
     try {
+      if (session.currentIndex === 0 && Object.keys(session.reviews).length === 0) {
+        localStorage.removeItem(storageKey)
+        return
+      }
+
+      const saved: PersistedReviewSession = {
+        ...session.reviews,
+        __index: session.currentIndex,
+      }
       localStorage.setItem(storageKey, JSON.stringify(saved))
     } catch {
       // The review remains usable if browser storage is unavailable.
@@ -66,6 +70,10 @@ export function useReviewSession() {
       const currentIndex = Math.min(current.currentIndex, Math.max(0, count - 1))
       return currentIndex === current.currentIndex ? current : { ...current, currentIndex }
     })
+  }, [])
+
+  const clearProgress = useCallback(() => {
+    setSession({ reviews: {}, currentIndex: 0 })
   }, [])
 
   const updateField = useCallback((reviewItemId: string, field: string, value: string) => {
@@ -133,6 +141,7 @@ export function useReviewSession() {
     selectedIndex: session.currentIndex,
     selectIndex,
     clampIndex,
+    clearProgress,
     updateScore,
     updateConfidence,
     updateFeedback,

@@ -15,6 +15,7 @@ function App() {
     selectedIndex,
     selectIndex,
     clampIndex,
+    clearProgress,
     updateScore,
     updateConfidence,
     updateFeedback,
@@ -53,6 +54,7 @@ function App() {
         reviews={reviews}
         selectedIndex={selectedIndex}
         onSelectExam={selectIndex}
+        onClearProgress={clearProgress}
         loading={loading}
         error={error}
       />

@@ -6,6 +6,7 @@ import {
   ComboboxItem,
   ComboboxList,
 } from '@/components/ui/combobox'
+import { ClearDraftDialog } from '@/features/review/components/ClearDraftDialog'
 import type { Exam } from '@/features/review/lib/exam-loader'
 import { isReviewComplete } from '@/features/review/lib/scoring'
 import type { ReviewEntry } from '@/features/review/types'
@@ -15,6 +16,7 @@ type ReviewTopBarProps = {
   reviews: Record<string, ReviewEntry>
   selectedIndex: number
   onSelectExam: (index: number) => void
+  onClearProgress: () => void
   loading: boolean
   error: string | null
 }
@@ -24,6 +26,7 @@ export function ReviewTopBar({
   reviews,
   selectedIndex,
   onSelectExam,
+  onClearProgress,
   loading,
   error,
 }: ReviewTopBarProps) {
@@ -84,7 +87,11 @@ export function ReviewTopBar({
         </Combobox>
       </div>
 
-      <div className="min-h-10 min-w-32 text-right text-sm text-muted-foreground sm:content-center">
+      <div className="flex min-h-10 min-w-32 items-center justify-end gap-3 text-right text-sm text-muted-foreground">
+        <ClearDraftDialog
+          disabled={Object.keys(reviews).length === 0 && selectedIndex === 0}
+          onConfirm={onClearProgress}
+        />
         {error ? (
           <p role="status" className="text-destructive">{error}</p>
         ) : selectedExam ? (

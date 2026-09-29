@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { PersistedReviewSession, ReviewEntry, ReviewSession } from '@/features/review/types'
+import type { Exam } from '@/features/review/lib/exam-loader'
+import { canCompleteReview, criterionScore } from '@/features/review/lib/scoring'
+import type {
+  PersistedReviewSession,
+  ReviewConfidence,
+  ReviewEntry,
+  ReviewSession,
+} from '@/features/review/types'
 
 const storageKey = 'krugrade-vite-human-review-v1'
 
@@ -61,7 +68,7 @@ export function useReviewSession() {
     })
   }, [])
 
-  const updateScore = useCallback((reviewItemId: string, criterionId: string, score: number) => {
+  const updateField = useCallback((reviewItemId: string, field: string, value: string) => {
     setSession((current) => {
       const review = current.reviews[reviewItemId] || {}
       return {
@@ -70,8 +77,51 @@ export function useReviewSession() {
           ...current.reviews,
           [reviewItemId]: {
             ...review,
-            [`criterion_score_${criterionId}`]: String(score),
+            [field]: value,
             review_started_at: review.review_started_at || new Date().toISOString(),
+          },
+        },
+      }
+    })
+  }, [])
+
+  const updateScore = useCallback((reviewItemId: string, criterionId: string, score: number) => {
+    updateField(reviewItemId, `criterion_score_${criterionId}`, String(score))
+  }, [updateField])
+
+  const updateConfidence = useCallback((reviewItemId: string, confidence: ReviewConfidence) => {
+    updateField(reviewItemId, 'review_confidence', confidence)
+  }, [updateField])
+
+  const updateFeedback = useCallback((reviewItemId: string, feedback: string) => {
+    updateField(reviewItemId, 'feedback_to_student', feedback)
+  }, [updateField])
+
+  const completeReview = useCallback((exam: Exam) => {
+    setSession((current) => {
+      const review = current.reviews[exam.review_item_id] || {}
+      if (review.review_status === 'completed' || !canCompleteReview(exam.criteria, review)) {
+        return current
+      }
+
+      const now = new Date().toISOString()
+      const scores = Object.fromEntries(
+        exam.criteria.map((criterion) => [
+          `criterion_score_${criterion.id}`,
+          String(criterionScore(criterion, review)),
+        ]),
+      )
+
+      return {
+        ...current,
+        reviews: {
+          ...current.reviews,
+          [exam.review_item_id]: {
+            ...review,
+            ...scores,
+            review_started_at: review.review_started_at || now,
+            review_status: 'completed',
+            reviewed_at: now,
           },
         },
       }
@@ -84,5 +134,8 @@ export function useReviewSession() {
     selectIndex,
     clampIndex,
     updateScore,
+    updateConfidence,
+    updateFeedback,
+    completeReview,
   }
 }

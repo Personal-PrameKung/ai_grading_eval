@@ -18,3 +18,14 @@ export function scoreTotal(criteria: Criterion[], review: ReviewEntry | undefine
 export function maximumScore(criteria: Criterion[]): number {
   return criteria.reduce((total, criterion) => total + criterion.max, 0)
 }
+
+export function canCompleteReview(criteria: Criterion[], review: ReviewEntry | undefined): boolean {
+  const confidence = review?.review_confidence
+  const confidenceSelected = confidence === '1' || confidence === '2' || confidence === '3'
+  const criteriaScored = criteria.every((criterion) => {
+    const score = criterionScore(criterion, review)
+    return Number.isInteger(score) && score >= 0 && score <= criterion.max
+  })
+
+  return criteriaScored && confidenceSelected
+}

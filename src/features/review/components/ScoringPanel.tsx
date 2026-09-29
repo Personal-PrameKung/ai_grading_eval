@@ -1,17 +1,55 @@
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import type { Exam } from '@/features/review/lib/exam-loader'
-import { criterionScore, maximumScore, scoreTotal } from '@/features/review/lib/scoring'
-import type { ReviewEntry } from '@/features/review/types'
+import { canCompleteReview, criterionScore, maximumScore, scoreTotal } from '@/features/review/lib/scoring'
+import type { ReviewConfidence, ReviewEntry } from '@/features/review/types'
+
+const confidenceOptions = [
+  { value: '1', label: 'Low' },
+  { value: '2', label: 'Medium' },
+  { value: '3', label: 'High' },
+] as const
 
 type ScoringPanelProps = {
   exam: Exam
   review: ReviewEntry | undefined
   onScoreChange: (criterionId: string, score: number) => void
+  onConfidenceChange: (confidence: ReviewConfidence) => void
+  onFeedbackChange: (feedback: string) => void
+  hasPrevious: boolean
+  hasNext: boolean
+  onPrevious: () => void
+  onComplete: () => void
+  onNext: () => void
 }
 
-export function ScoringPanel({ exam, review, onScoreChange }: ScoringPanelProps) {
+export function ScoringPanel({
+  exam,
+  review,
+  onScoreChange,
+  onConfidenceChange,
+  onFeedbackChange,
+  hasPrevious,
+  hasNext,
+  onPrevious,
+  onComplete,
+  onNext,
+}: ScoringPanelProps) {
+  const [completionAttempted, setCompletionAttempted] = useState(false)
   const total = scoreTotal(exam.criteria, review)
   const maximum = maximumScore(exam.criteria)
+  const completed = review?.review_status === 'completed'
+  const canComplete = canCompleteReview(exam.criteria, review)
+
+  const handleComplete = () => {
+    if (!canComplete) {
+      setCompletionAttempted(true)
+      return
+    }
+
+    onComplete()
+  }
 
   return (
     <aside aria-labelledby="scoring-title" className="min-w-0 self-start rounded-xl border bg-card p-4 shadow-sm sm:p-6">
@@ -64,6 +102,84 @@ export function ScoringPanel({ exam, review, onScoreChange }: ScoringPanelProps)
           )
         })}
       </div>
+
+      <section aria-labelledby="confidence-title" className="mt-6">
+        <h3 id="confidence-title" className="text-sm font-semibold">Confidence</h3>
+        <div
+          role="group"
+          aria-label="Review confidence"
+          aria-invalid={completionAttempted && !canComplete}
+          className="mt-3 flex flex-wrap gap-2"
+        >
+          {confidenceOptions.map((option) => {
+            const selected = review?.review_confidence === option.value
+
+            return (
+              <Button
+                key={option.value}
+                type="button"
+                size="sm"
+                variant={selected ? 'default' : 'outline'}
+                aria-pressed={selected}
+                onClick={() => onConfidenceChange(option.value)}
+              >
+                {option.label}
+              </Button>
+            )
+          })}
+        </div>
+        {completionAttempted && !canComplete && (
+          <p role="alert" className="mt-2 text-xs text-destructive">
+            Choose a confidence level before completing this review.
+          </p>
+        )}
+      </section>
+
+      <div className="mt-6">
+        <label htmlFor="feedback-to-student" className="text-sm font-semibold">
+          Feedback to student
+        </label>
+        <Textarea
+          id="feedback-to-student"
+          value={review?.feedback_to_student || ''}
+          onChange={(event) => onFeedbackChange(event.target.value)}
+          placeholder="Write feedback for the student…"
+          className="mt-3 min-h-28 resize-y"
+        />
+      </div>
+
+      <footer className="mt-6 flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-9 w-14 px-0"
+          disabled={!hasPrevious}
+          onClick={onPrevious}
+        >
+          Prev
+        </Button>
+        <Button
+          type="button"
+          variant="default"
+          size="sm"
+          className="h-9 min-w-0 flex-1 px-2"
+          disabled={completed}
+          onClick={handleComplete}
+        >
+          {completed ? 'Completed' : 'Complete'}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-9 w-14 px-0"
+          disabled={!hasNext}
+          onClick={onNext}
+        >
+          Next
+        </Button>
+      </footer>
     </aside>
   )
 }

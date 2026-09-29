@@ -52,103 +52,105 @@ export function ScoringPanel({
   }
 
   return (
-    <aside aria-labelledby="scoring-title" className="min-w-0 self-start rounded-xl border bg-card p-4 shadow-sm sm:p-6 md:sticky md:top-4 md:max-h-[calc(100dvh-2rem)] md:overflow-y-auto">
-      <div className="flex items-center justify-between gap-3">
-        <h2 id="scoring-title" className="text-sm font-semibold">
-          Score response
-        </h2>
-        <div className="shrink-0 text-right" aria-label={`Total score: ${total} out of ${maximum}`}>
-          <span className="text-2xl font-semibold text-primary">{total}</span>
-          <span className="text-sm text-muted-foreground"> / {maximum}</span>
+    <aside aria-labelledby="scoring-title" className="min-w-0 self-start rounded-xl border bg-card p-4 shadow-sm sm:p-6 md:sticky md:top-4 md:flex md:max-h-[calc(100dvh-2rem)] md:flex-col md:overflow-hidden">
+      <div className="md:min-h-0 md:flex-1 md:overflow-y-auto">
+        <div className="flex items-center justify-between gap-3">
+          <h2 id="scoring-title" className="text-sm font-semibold">
+            Score response
+          </h2>
+          <div className="shrink-0 text-right" aria-label={`Total score: ${total} out of ${maximum}`}>
+            <span className="text-2xl font-semibold text-primary">{total}</span>
+            <span className="text-sm text-muted-foreground"> / {maximum}</span>
+          </div>
         </div>
-      </div>
 
-      <div className="mt-5 space-y-4">
-        {exam.criteria.map((criterion) => {
-          const selectedScore = criterionScore(criterion, review)
-
-          return (
-            <section key={criterion.id} className="rounded-lg border bg-muted/20 p-3">
-              <div className="flex items-baseline gap-1.5">
-                <h3 className="text-sm font-semibold">{criterion.id}</h3>
-                <span className="text-xs text-muted-foreground">
-                  {criterion.max} max
-                </span>
-              </div>
-              <p className="mt-2 break-words text-sm leading-6 text-foreground/85">
-                {criterion.text}
-              </p>
-              <div
-                role="group"
-                aria-label={`Score for ${criterion.id}, maximum ${criterion.max}`}
-                className="mt-3 flex flex-wrap gap-2"
-              >
-                {Array.from({ length: criterion.max + 1 }, (_, score) => (
-                  <Button
-                    key={score}
-                    type="button"
-                    size="icon-sm"
-                    variant={score === selectedScore ? 'default' : 'outline'}
-                    className="text-xs"
-                    aria-pressed={score === selectedScore}
-                    aria-label={`${score} points for ${criterion.id}`}
-                    onClick={() => onScoreChange(criterion.id, score)}
-                  >
-                    {score}
-                  </Button>
-                ))}
-              </div>
-            </section>
-          )
-        })}
-      </div>
-
-      <section aria-labelledby="confidence-title" className="mt-6">
-        <h3 id="confidence-title" className="text-sm font-semibold">Confidence</h3>
-        <div
-          role="group"
-          aria-label="Review confidence"
-          aria-invalid={completionAttempted && !canComplete}
-          className="mt-3 flex flex-wrap gap-2"
-        >
-          {confidenceOptions.map((option) => {
-            const selected = review?.review_confidence === option.value
+        <div className="mt-5 space-y-4">
+          {exam.criteria.map((criterion) => {
+            const selectedScore = criterionScore(criterion, review)
 
             return (
-              <Button
-                key={option.value}
-                type="button"
-                size="sm"
-                variant={selected ? 'default' : 'outline'}
-                aria-pressed={selected}
-                onClick={() => onConfidenceChange(option.value)}
-              >
-                {option.label}
-              </Button>
+              <section key={criterion.id} className="rounded-lg border bg-muted/20 p-3">
+                <div className="flex items-baseline gap-1.5">
+                  <h3 className="text-sm font-semibold">{criterion.id}</h3>
+                  <span className="text-xs text-muted-foreground">
+                    {criterion.max} max
+                  </span>
+                </div>
+                <p className="mt-2 break-words text-sm leading-6 text-foreground/85">
+                  {criterion.text}
+                </p>
+                <div
+                  role="group"
+                  aria-label={`Score for ${criterion.id}, maximum ${criterion.max}`}
+                  className="mt-3 flex flex-wrap gap-2"
+                >
+                  {Array.from({ length: criterion.max + 1 }, (_, score) => (
+                    <Button
+                      key={score}
+                      type="button"
+                      size="icon-sm"
+                      variant={score === selectedScore ? 'default' : 'outline'}
+                      className="text-xs"
+                      aria-pressed={score === selectedScore}
+                      aria-label={`${score} points for ${criterion.id}`}
+                      onClick={() => onScoreChange(criterion.id, score)}
+                    >
+                      {score}
+                    </Button>
+                  ))}
+                </div>
+              </section>
             )
           })}
         </div>
-        {completionAttempted && !canComplete && (
-          <p role="alert" className="mt-2 text-xs text-destructive">
-            Choose a confidence level before completing this review.
-          </p>
-        )}
-      </section>
 
-      <div className="mt-6">
-        <label htmlFor="feedback-to-student" className="text-sm font-semibold">
-          Feedback to student
-        </label>
-        <Textarea
-          id="feedback-to-student"
-          value={review?.feedback_to_student || ''}
-          onChange={(event) => onFeedbackChange(event.target.value)}
-          placeholder="Write feedback for the student…"
-          className="mt-3 min-h-20 resize-y"
-        />
+        <section aria-labelledby="confidence-title" className="mt-6">
+          <h3 id="confidence-title" className="text-sm font-semibold">Confidence</h3>
+          <div
+            role="group"
+            aria-label="Review confidence"
+            aria-invalid={completionAttempted && !canComplete}
+            className="mt-3 flex flex-wrap gap-2"
+          >
+            {confidenceOptions.map((option) => {
+              const selected = review?.review_confidence === option.value
+
+              return (
+                <Button
+                  key={option.value}
+                  type="button"
+                  size="sm"
+                  variant={selected ? 'default' : 'outline'}
+                  aria-pressed={selected}
+                  onClick={() => onConfidenceChange(option.value)}
+                >
+                  {option.label}
+                </Button>
+              )
+            })}
+          </div>
+          {completionAttempted && !canComplete && (
+            <p role="alert" className="mt-2 text-xs text-destructive">
+              Choose a confidence level before completing this review.
+            </p>
+          )}
+        </section>
+
+        <div className="mt-6">
+          <label htmlFor="feedback-to-student" className="text-sm font-semibold">
+            Feedback to student
+          </label>
+          <Textarea
+            id="feedback-to-student"
+            value={review?.feedback_to_student || ''}
+            onChange={(event) => onFeedbackChange(event.target.value)}
+            placeholder="Write feedback for the student…"
+            className="mt-3 min-h-20 resize-y"
+          />
+        </div>
       </div>
 
-      <footer className="mt-6 flex gap-2">
+      <footer className="mt-6 flex shrink-0 gap-2">
         <Button
           type="button"
           variant="outline"

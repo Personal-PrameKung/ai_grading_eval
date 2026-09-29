@@ -53,18 +53,25 @@ export function ScoringPanel({
 
   return (
     <aside aria-labelledby="scoring-title" className="min-w-0 self-start rounded-xl border bg-card p-4 shadow-sm sm:p-6 md:sticky md:top-4 md:flex md:max-h-[calc(100dvh-2rem)] md:flex-col md:overflow-hidden">
-      <div className="md:min-h-0 md:flex-1 md:overflow-y-auto">
-        <div className="flex items-center justify-between gap-3">
+      <div className="flex shrink-0 items-center justify-between gap-3">
+        <div>
           <h2 id="scoring-title" className="text-sm font-semibold">
             Score response
           </h2>
-          <div className="shrink-0 text-right" aria-label={`Total score: ${total} out of ${maximum}`}>
-            <span className="text-2xl font-semibold text-primary">{total}</span>
-            <span className="text-sm text-muted-foreground"> / {maximum}</span>
-          </div>
+          <p aria-live="polite" className={completed
+            ? 'mt-1 text-sm font-medium text-emerald-700 dark:text-emerald-400'
+            : 'mt-1 text-sm text-muted-foreground'}>
+            {completed ? 'Completed' : 'Not completed'}
+          </p>
         </div>
+        <div className="shrink-0 text-right" aria-label={`Total score: ${total} out of ${maximum}`}>
+          <span className="text-2xl font-semibold text-primary">{total}</span>
+          <span className="text-sm text-muted-foreground"> / {maximum}</span>
+        </div>
+      </div>
 
-        <div className="mt-5 space-y-4">
+      <div className="mt-5 md:min-h-0 md:flex-1 md:overflow-y-auto">
+        <div className="space-y-4">
           {exam.criteria.map((criterion) => {
             const selectedScore = criterionScore(criterion, review)
 

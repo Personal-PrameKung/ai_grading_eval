@@ -52,7 +52,7 @@ export function ScoringPanel({
   }
 
   return (
-    <aside aria-labelledby="scoring-title" className="min-w-0 self-start rounded-xl border bg-card p-4 shadow-sm sm:p-6">
+    <aside aria-labelledby="scoring-title" className="min-w-0 self-start rounded-xl border bg-card p-4 shadow-sm sm:p-6 md:sticky md:top-4 md:max-h-[calc(100dvh-2rem)] md:overflow-y-auto">
       <div className="flex items-center justify-between gap-3">
         <h2 id="scoring-title" className="text-sm font-semibold">
           Score response
@@ -144,7 +144,7 @@ export function ScoringPanel({
           value={review?.feedback_to_student || ''}
           onChange={(event) => onFeedbackChange(event.target.value)}
           placeholder="Write feedback for the student…"
-          className="mt-3 min-h-28 resize-y"
+          className="mt-3 min-h-20 resize-y"
         />
       </div>
 

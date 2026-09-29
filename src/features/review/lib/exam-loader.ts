@@ -11,6 +11,10 @@ export type ContextImage = {
 export type Exam = Record<string, unknown> & {
   review_item_id: string
   question_id: string
+  question_text: string
+  canonical_solution: string
+  answer_text: string
+  rubric_scoring_guide: string
   question_asset: QuestionAsset
   context_images: ContextImage[]
 }
@@ -19,6 +23,15 @@ const defaultExamDataUrl = '/data/assignments.json'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function requiredText(value: Record<string, unknown>, field: string, rowIndex: number): string {
+  const text = value[field]
+  if (typeof text !== 'string') {
+    throw new Error(`Exam row ${rowIndex + 1} has an invalid ${field}`)
+  }
+
+  return text
 }
 
 function parseQuestionAsset(value: unknown, rowIndex: number): QuestionAsset {
@@ -61,6 +74,10 @@ function parseExam(value: unknown, rowIndex: number): Exam {
     ...value,
     review_item_id: value.review_item_id,
     question_id: value.question_id,
+    question_text: requiredText(value, 'question_text', rowIndex),
+    canonical_solution: requiredText(value, 'canonical_solution', rowIndex),
+    answer_text: requiredText(value, 'answer_text', rowIndex),
+    rubric_scoring_guide: requiredText(value, 'rubric_scoring_guide', rowIndex),
     question_asset: parseQuestionAsset(value.question_asset, rowIndex),
     context_images: parseContextImages(value.context_images, rowIndex),
   }

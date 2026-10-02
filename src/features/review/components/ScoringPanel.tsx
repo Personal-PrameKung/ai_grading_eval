@@ -176,7 +176,7 @@ export function ScoringPanel({
           disabled={completed}
           onClick={handleComplete}
         >
-          {completed ? 'Completed' : 'Complete'}
+          {completed ? 'Completed' : 'Mark complete'}
         </Button>
         <Button
           type="button"

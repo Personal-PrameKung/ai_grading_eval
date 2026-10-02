@@ -7,6 +7,7 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox'
 import { ClearDraftDialog } from '@/features/review/components/ClearDraftDialog'
+import { ExportCsvDialog } from '@/features/review/components/ExportCsvDialog'
 import type { Exam } from '@/features/review/lib/exam-loader'
 import { isReviewComplete } from '@/features/review/lib/scoring'
 import type { ReviewEntry } from '@/features/review/types'
@@ -17,6 +18,7 @@ type ReviewTopBarProps = {
   selectedIndex: number
   onSelectExam: (index: number) => void
   onClearProgress: () => void
+  onExportCsv: () => void
   loading: boolean
   error: string | null
 }
@@ -27,6 +29,7 @@ export function ReviewTopBar({
   selectedIndex,
   onSelectExam,
   onClearProgress,
+  onExportCsv,
   loading,
   error,
 }: ReviewTopBarProps) {
@@ -40,7 +43,7 @@ export function ReviewTopBar({
   const selectedCompleted = selectedExam && completedOptions.has(examOptions[selectedIndex])
 
   return (
-    <header className="mx-auto flex w-full max-w-7xl flex-col gap-4 rounded-xl border bg-card px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+    <header className="mx-auto flex w-full max-w-7xl flex-col gap-4 rounded-xl border bg-card px-5 py-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-6 lg:flex-nowrap">
       <div className="min-w-0">
         <p className="text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
           Human grading
@@ -88,6 +91,7 @@ export function ReviewTopBar({
       </div>
 
       <div className="flex min-h-10 min-w-32 items-center justify-end gap-3 text-right text-sm text-muted-foreground">
+        <ExportCsvDialog count={exams.length} onConfirm={onExportCsv} />
         <ClearDraftDialog
           disabled={Object.keys(reviews).length === 0 && selectedIndex === 0}
           onConfirm={onClearProgress}

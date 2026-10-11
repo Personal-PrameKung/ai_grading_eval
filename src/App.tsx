@@ -4,6 +4,8 @@ import { ReviewTopBar } from '@/features/review/components/ReviewTopBar'
 import { ScoringPanel } from '@/features/review/components/ScoringPanel'
 import { useReviewKeyboard } from '@/features/review/hooks/useReviewKeyboard'
 import { useReviewSession } from '@/features/review/hooks/useReviewSession'
+import { serializeReviewsCsv } from '@/features/review/lib/csv'
+import { downloadCsv } from '@/features/review/lib/download-csv'
 import { loadExams, type Exam } from '@/features/review/lib/exam-loader'
 
 function App() {
@@ -55,6 +57,7 @@ function App() {
         selectedIndex={selectedIndex}
         onSelectExam={selectIndex}
         onClearProgress={clearProgress}
+        onExportCsv={() => downloadCsv(serializeReviewsCsv(exams, reviews))}
         loading={loading}
         error={error}
       />
